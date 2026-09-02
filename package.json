@@ -1,6 +1,6 @@
 {
   "name": "@havadis/sdk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Typed Node.js SDK for the Havadis REST API — content generation, topic discovery, publishing.",
   "license": "MIT",
   "repository": {
