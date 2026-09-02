@@ -1,0 +1,30 @@
+name: release
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  # OIDC token for npm trusted publishing — no NPM_TOKEN secret exists.
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          registry-url: https://registry.npmjs.org
+      - run: npm ci --legacy-peer-deps
+      - run: npm run generate:types
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npm run check:no-tla
+      - run: npm run lint:package
+      # Trusted publishing: npm exchanges the OIDC token minted for THIS
+      # workflow file (release.yml — the name configured on npmjs.com) for
+      # a publish grant; provenance is attached automatically.
+      - run: npm publish --access public

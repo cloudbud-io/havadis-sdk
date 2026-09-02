@@ -1,0 +1,51 @@
+{
+  "name": "@havadis/sdk",
+  "version": "0.1.0",
+  "description": "Typed Node.js SDK for the Havadis REST API \u2014 content generation, topic discovery, publishing.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloudbud-io/havadis-sdk.git"
+  },
+  "homepage": "https://gethavadis.co/developers",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "browser": "./dist/browser-shim.mjs",
+      "module-sync": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "docs",
+    "openapi.json"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "generate:types": "openapi-typescript openapi.json -o src/generated/openapi-types.ts",
+    "build": "tsdown",
+    "build:tsc": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p examples/tsconfig.json",
+    "test": "vitest run",
+    "lint:package": "publint && attw --pack . --profile esm-only",
+    "check:no-tla": "node scripts/check-no-top-level-await.mjs"
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.2",
+    "@types/node": "^22.20.1",
+    "openapi-typescript": "^7.9.1",
+    "publint": "^0.3.14",
+    "tsdown": "0.22.0",
+    "typescript": "^5.7.3",
+    "unrun": "^0.2.39",
+    "vitest": "^3.2.4"
+  }
+}
