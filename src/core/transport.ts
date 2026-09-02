@@ -40,6 +40,16 @@ export interface FetchTransportOptions {
   fetch?: typeof fetch;
 }
 
+/**
+ * Replaced by tsdown's `define` at build time with the version in
+ * package.json. Source runs (vitest, `tsx`) have no define, so `typeof`
+ * is mandatory here — a bare reference to an undeclared identifier
+ * throws ReferenceError, `typeof` on one does not.
+ */
+declare const __SDK_VERSION__: string | undefined;
+const SDK_VERSION =
+  typeof __SDK_VERSION__ === 'string' ? __SDK_VERSION__ : '0.0.0-dev';
+
 // The façade lives on the api subdomain — gethavadis.co serves the app and
 // proxies nothing under /api. Keep this in step with `servers[0].url` in
 // openapi.json; the quickstart omits `baseUrl`, so a wrong value here 404s
@@ -107,7 +117,7 @@ export class FetchTransport implements Transport {
     const headers: Record<string, string> = {
       authorization: `Bearer ${this.apiKey}`,
       accept: 'application/json',
-      'user-agent': 'havadis-sdk/0.1.0 (node)',
+      'user-agent': `havadis-sdk/${SDK_VERSION} (node)`,
     };
     if (req.body !== undefined) headers['content-type'] = 'application/json';
     if (req.idempotencyKey) headers['idempotency-key'] = req.idempotencyKey;

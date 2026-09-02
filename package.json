@@ -36,7 +36,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p examples/tsconfig.json",
     "test": "vitest run",
     "lint:package": "publint && attw --pack . --profile esm-only",
-    "check:no-tla": "node scripts/check-no-top-level-await.mjs"
+    "check:no-tla": "node scripts/check-no-top-level-await.mjs",
+    "check:ua-version": "node scripts/check-user-agent-version.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.2",

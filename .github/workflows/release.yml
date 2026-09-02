@@ -23,6 +23,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run check:no-tla
+      - run: npm run check:ua-version
       - run: npm run lint:package
       # Trusted publishing: npm exchanges the OIDC token minted for THIS
       # workflow file (release.yml — the name configured on npmjs.com) for
