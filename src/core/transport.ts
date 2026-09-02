@@ -31,7 +31,7 @@ export interface Transport {
 
 export interface FetchTransportOptions {
   apiKey: string;
-  /** Origin only, e.g. https://gethavadis.co — paths carry /api/v1. */
+  /** Origin only, e.g. https://api.gethavadis.co — paths carry /api/v1. */
   baseUrl?: string;
   /** Per-attempt timeout. */
   timeoutMs?: number;
@@ -40,7 +40,11 @@ export interface FetchTransportOptions {
   fetch?: typeof fetch;
 }
 
-const DEFAULT_BASE_URL = 'https://gethavadis.co';
+// The façade lives on the api subdomain — gethavadis.co serves the app and
+// proxies nothing under /api. Keep this in step with `servers[0].url` in
+// openapi.json; the quickstart omits `baseUrl`, so a wrong value here 404s
+// every first call an integrator makes.
+const DEFAULT_BASE_URL = 'https://api.gethavadis.co';
 const DEFAULT_TIMEOUT_MS = 30_000;
 const DEFAULT_MAX_RETRIES = 2;
 

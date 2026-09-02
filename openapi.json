@@ -8,7 +8,7 @@
   },
   "servers": [
     {
-      "url": "https://gethavadis.co"
+      "url": "https://api.gethavadis.co"
     }
   ],
   "security": [
