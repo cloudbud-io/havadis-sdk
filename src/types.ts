@@ -96,6 +96,8 @@ export interface CreateJobParams {
   coverImageReferenceUrl?: string | null;
   coverStyleTemplateKey?: string | null;
   viralOptions?: Record<string, unknown> | null;
+  /** Ad creative runs/jobs: `{ objective, conceptCount }`; ignored for other types. */
+  adOptions?: Record<string, unknown> | null;
 }
 
 export interface TopicSuggestion {
@@ -119,6 +121,8 @@ export interface SuggestTopicsParams {
   coverImageReferenceUrl?: string | null;
   coverStyleTemplateKey?: string | null;
   viralOptions?: Record<string, unknown> | null;
+  /** Ad creative runs/jobs: `{ objective, conceptCount }`; ignored for other types. */
+  adOptions?: Record<string, unknown> | null;
 }
 
 export interface PublishParams {
