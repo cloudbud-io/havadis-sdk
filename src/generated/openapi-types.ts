@@ -654,7 +654,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    contentTypes: ("blog" | "linkedin" | "instagram" | "pinterest" | "x_thread" | "viral_content")[];
+                    contentTypes: ("blog" | "linkedin" | "instagram" | "pinterest" | "x_thread" | "viral_content" | "ad_creative")[];
                     brief: string;
                     /** @default [] */
                     styleUrls?: string[];
@@ -666,7 +666,6 @@ export interface operations {
                     targetPersonaId?: string | null;
                     /** @default  */
                     instructions?: string;
-                    /** @default en */
                     language?: string;
                     /** @default null */
                     wordCountRange?: ("short" | "medium" | "long" | "unlimited") | null;
@@ -675,7 +674,7 @@ export interface operations {
                     /** @default null */
                     suggestionId?: string | null;
                     /** @default null */
-                    origin?: ("manual" | "suggestion" | "search_console" | "bulk_plan") | null;
+                    origin?: ("manual" | "suggestion" | "search_console" | "bulk_plan" | "ai_visibility" | "meta_ads") | null;
                     /** @default null */
                     useCaseId?: string | null;
                     /** @default null */
@@ -684,6 +683,14 @@ export interface operations {
                     viralOptions?: {
                         mediums: ("image" | "video")[];
                         conceptCount: number;
+                    } | null;
+                    /** @default null */
+                    adOptions?: {
+                        /** @enum {string} */
+                        objective: "awareness" | "consideration" | "conversion";
+                        conceptCount: number;
+                        /** @default null */
+                        directive?: string | null;
                     } | null;
                     /** @default false */
                     generateCoverImage?: boolean;
@@ -722,7 +729,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    contentTypes: ("blog" | "linkedin" | "instagram" | "pinterest" | "x_thread" | "viral_content")[];
+                    contentTypes: ("blog" | "linkedin" | "instagram" | "pinterest" | "x_thread" | "viral_content" | "ad_creative")[];
                 };
             };
         };
@@ -795,9 +802,9 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    language?: "tr" | "en" | "de" | "fr" | "es" | "it" | "pt" | "nl" | "ar" | "ja" | "ko" | "zh";
+                    language?: "en" | "tr" | "de" | "fr" | "es" | "it" | "pt" | "nl" | "ar" | "ja" | "ko" | "zh";
                     /** @enum {string} */
-                    contentType?: "blog" | "linkedin" | "instagram" | "pinterest" | "x_thread" | "viral_content";
+                    contentType?: "blog" | "linkedin" | "instagram" | "pinterest" | "x_thread" | "viral_content" | "ad_creative";
                     targetPersonaId?: string | null;
                     /** @default false */
                     generateCoverImage?: boolean;
@@ -809,6 +816,19 @@ export interface operations {
                     viralOptions?: {
                         mediums: ("image" | "video")[];
                         conceptCount: number;
+                    } | null;
+                    /** @default null */
+                    adOptions?: {
+                        /** @enum {string} */
+                        objective: "awareness" | "consideration" | "conversion";
+                        conceptCount: number;
+                        /** @default null */
+                        directive?: string | null;
+                    } | null;
+                    focus?: {
+                        /** @constant */
+                        source: "ai_visibility";
+                        promptId: string;
                     } | null;
                 };
             };

@@ -964,7 +964,7 @@
                 "properties": {
                   "contentTypes": {
                     "minItems": 1,
-                    "maxItems": 6,
+                    "maxItems": 7,
                     "type": "array",
                     "items": {
                       "type": "string",
@@ -974,7 +974,8 @@
                         "instagram",
                         "pinterest",
                         "x_thread",
-                        "viral_content"
+                        "viral_content",
+                        "ad_creative"
                       ]
                     }
                   },
@@ -1027,7 +1028,6 @@
                     "maxLength": 2000
                   },
                   "language": {
-                    "default": "en",
                     "type": "string",
                     "minLength": 2,
                     "maxLength": 5
@@ -1081,7 +1081,9 @@
                           "manual",
                           "suggestion",
                           "search_console",
-                          "bulk_plan"
+                          "bulk_plan",
+                          "ai_visibility",
+                          "meta_ads"
                         ]
                       },
                       {
@@ -1136,6 +1138,48 @@
                         },
                         "required": [
                           "mediums",
+                          "conceptCount"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "adOptions": {
+                    "default": null,
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "objective": {
+                            "type": "string",
+                            "enum": [
+                              "awareness",
+                              "consideration",
+                              "conversion"
+                            ]
+                          },
+                          "conceptCount": {
+                            "type": "integer",
+                            "minimum": 2,
+                            "maximum": 6
+                          },
+                          "directive": {
+                            "default": null,
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 2000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "objective",
                           "conceptCount"
                         ]
                       },
@@ -1425,7 +1469,8 @@
                         "instagram",
                         "pinterest",
                         "x_thread",
-                        "viral_content"
+                        "viral_content",
+                        "ad_creative"
                       ]
                     }
                   }
@@ -1638,8 +1683,8 @@
                   "language": {
                     "type": "string",
                     "enum": [
-                      "tr",
                       "en",
+                      "tr",
                       "de",
                       "fr",
                       "es",
@@ -1660,7 +1705,8 @@
                       "instagram",
                       "pinterest",
                       "x_thread",
-                      "viral_content"
+                      "viral_content",
+                      "ad_creative"
                     ]
                   },
                   "targetPersonaId": {
@@ -1737,6 +1783,74 @@
                           "mediums",
                           "conceptCount"
                         ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "adOptions": {
+                    "default": null,
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "objective": {
+                            "type": "string",
+                            "enum": [
+                              "awareness",
+                              "consideration",
+                              "conversion"
+                            ]
+                          },
+                          "conceptCount": {
+                            "type": "integer",
+                            "minimum": 2,
+                            "maximum": 6
+                          },
+                          "directive": {
+                            "default": null,
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "maxLength": 2000
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          }
+                        },
+                        "required": [
+                          "objective",
+                          "conceptCount"
+                        ]
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "focus": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "source": {
+                            "type": "string",
+                            "const": "ai_visibility"
+                          },
+                          "promptId": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64
+                          }
+                        },
+                        "required": [
+                          "source",
+                          "promptId"
+                        ],
+                        "additionalProperties": false
                       },
                       {
                         "type": "null"
