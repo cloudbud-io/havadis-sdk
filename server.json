@@ -11,7 +11,7 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://gethavadis.co/api/mcp"
+      "url": "https://api.gethavadis.co/api/mcp"
     }
   ]
 }
