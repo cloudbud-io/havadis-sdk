@@ -1,11 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Havadis } from '../src/client.js';
 import { verifyWebhook, WebhookVerificationError } from '../src/core/webhooks.js';
-import { waitForJob } from '../src/core/poller.js';
+import { waitForJob, waitForTopicRun } from '../src/core/poller.js';
 import { paginate } from '../src/core/pagination.js';
-import { JobFailedError } from '../src/core/errors.js';
+import { JobFailedError, TopicRunFailedError } from '../src/core/errors.js';
 import type { Transport } from '../src/core/transport.js';
-import type { Job, KeysetPage } from '../src/types.js';
+import type { Job, KeysetPage, TopicRun } from '../src/types.js';
 import { createHmac } from 'node:crypto';
 
 const API_KEY = `havadis_abcd1234_${'s'.repeat(32)}`;
@@ -85,6 +85,94 @@ describe('Havadis client', () => {
   });
 });
 
+describe('topics', () => {
+  it('suggest sends the focus as given, with an idempotency key', async () => {
+    const transport = fakeTransport(() => ({
+      status: 202,
+      body: { run_id: 'r1', status: 'pending', content_type: 'blog' },
+    }));
+    const client = new Havadis({ apiKey: API_KEY, transport });
+    const focus = {
+      source: 'product_page' as const,
+      url: 'https://patigo.com/app',
+      note: 'focus on veterinary clinics',
+    };
+
+    await client.brand('b1').topics.suggest({ contentType: 'blog', focus });
+
+    expect(transport.calls[0]).toMatchObject({
+      method: 'POST',
+      path: '/api/v1/brands/b1/topics/suggest',
+      body: { contentType: 'blog', focus },
+      idempotencyKey: expect.stringMatching(/[0-9a-f-]{36}/),
+    });
+  });
+
+  it('getRun reads the brand-scoped run', async () => {
+    const transport = fakeTransport(() => ({
+      status: 200,
+      body: { run_id: 'r1', status: 'thinking' },
+    }));
+    const client = new Havadis({ apiKey: API_KEY, transport });
+
+    await client.brand('b1').topics.getRun('r1');
+
+    expect(transport.calls[0]).toMatchObject({
+      method: 'GET',
+      path: '/api/v1/brands/b1/topics/runs/r1',
+    });
+  });
+});
+
+describe('waitForTopicRun', () => {
+  const run = (over: Partial<TopicRun>): TopicRun => ({
+    run_id: 'r1',
+    status: 'pending',
+    content_type: 'blog',
+    error_code: null,
+    credits_refunded: false,
+    suggestion_ids: [],
+    created_at: '',
+    updated_at: '',
+    ...over,
+  });
+
+  it('resolves with the suggestions a completed run produced', async () => {
+    const statuses: TopicRun['status'][] = ['preparing', 'thinking', 'completed'];
+
+    const result = await waitForTopicRun(
+      async () =>
+        run({
+          status: statuses.shift() ?? 'completed',
+          suggestion_ids: ['s1', 's2', 's3'],
+        }),
+      'r1',
+      { pollIntervalMs: 1 },
+    );
+
+    expect(result.suggestion_ids).toEqual(['s1', 's2', 's3']);
+  });
+
+  it('throws with the stable code, so a caller can tell an unreadable page apart', async () => {
+    const failure = waitForTopicRun(
+      async () =>
+        run({
+          status: 'failed',
+          error_code: 'product_page_unreadable',
+          credits_refunded: true,
+        }),
+      'r1',
+      { pollIntervalMs: 1 },
+    );
+
+    await expect(failure).rejects.toBeInstanceOf(TopicRunFailedError);
+    await expect(failure).rejects.toMatchObject({
+      errorCode: 'product_page_unreadable',
+      creditsRefunded: true,
+    });
+  });
+});
+
 describe('paginate', () => {
   it('walks pages by next_cursor and stops on has_more=false', async () => {
     const pages: KeysetPage<number>[] = [
@@ -107,7 +195,15 @@ describe('paginate', () => {
 
 describe('waitForJob', () => {
   const job = (status: string): Job =>
-    ({ id: 'j1', status, content_types: [], platforms: [], origin: null, created_at: '' }) as Job;
+    ({
+      id: 'j1',
+      status,
+      content_types: [],
+      platforms: [],
+      origin: null,
+      article_format: null,
+      created_at: '',
+    }) as Job;
 
   it('resolves on completed_with_warnings — warnings are success', async () => {
     const statuses = ['pending', 'running', 'completed_with_warnings'];

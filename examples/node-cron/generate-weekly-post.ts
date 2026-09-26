@@ -22,6 +22,10 @@ async function main(): Promise<void> {
         brief,
         keywords: topic?.suggested_keywords,
         language: topic?.language,
+        // Approves the suggestion into this job: it leaves the pending list,
+        // and a product-page suggestion keeps its use-case format and its
+        // product page as a research source.
+        suggestionId: topic?.id ?? null,
         // A stable key makes THIS cron run idempotent even if the host
         // restarts and re-executes it.
         // (Same ISO week → same key → server replays, no double charge.)

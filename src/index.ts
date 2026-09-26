@@ -22,6 +22,8 @@ export {
   NotFoundError,
   PermissionError,
   RateLimitError,
+  TopicRunFailedError,
+  TopicRunTimeoutError,
 } from './core/errors.js';
 export {
   verifyWebhook,

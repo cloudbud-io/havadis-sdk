@@ -1,6 +1,11 @@
 import { ensureIdempotencyKey } from '../core/idempotency.js';
 import { paginate, type ListOptions } from '../core/pagination.js';
-import { waitForJob, type WaitForOptions } from '../core/poller.js';
+import {
+  waitForJob,
+  waitForTopicRun,
+  type WaitForOptions,
+  type WaitForRunOptions,
+} from '../core/poller.js';
 import {
   requestOrThrow,
   type Transport,
@@ -18,6 +23,7 @@ import type {
   PublishParams,
   PublishResult,
   SuggestTopicsParams,
+  TopicRun,
   TopicSuggestion,
 } from '../types.js';
 
@@ -229,6 +235,11 @@ export class TopicsResource extends BaseResource {
     super(transport);
   }
 
+  /**
+   * Queues a discovery run (HTTP 202) — brand-wide, or pointed at one
+   * product page / AI-visibility question with `focus`. Follow it with
+   * `waitForRun(run_id)`, then read the suggestions with `list()`.
+   */
   suggest(
     params: SuggestTopicsParams = {},
     options?: { idempotencyKey?: string; signal?: AbortSignal },
@@ -240,6 +251,27 @@ export class TopicsResource extends BaseResource {
       idempotencyKey: ensureIdempotencyKey(options?.idempotencyKey),
       signal: options?.signal,
     });
+  }
+
+  /** One discovery run: status, the stable error code if it failed, results. */
+  getRun(runId: string, options?: { signal?: AbortSignal }): Promise<TopicRun> {
+    return requestOrThrow(this.transport, {
+      method: 'GET',
+      path: `/api/v1/brands/${this.brandId}/topics/runs/${runId}`,
+      signal: options?.signal,
+    });
+  }
+
+  /**
+   * Polls until the run finishes. Resolves on `completed`; throws
+   * `TopicRunFailedError` (carrying `errorCode`) on `failed`.
+   */
+  waitForRun(runId: string, options: WaitForRunOptions = {}): Promise<TopicRun> {
+    return waitForTopicRun(
+      () => this.getRun(runId, { signal: options.signal }),
+      runId,
+      options,
+    );
   }
 
   async list(

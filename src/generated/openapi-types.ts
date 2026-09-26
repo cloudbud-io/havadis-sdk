@@ -238,10 +238,30 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Queue topic discovery (async — results land in topics.list)
+         * Queue topic discovery — brand-wide, or focused on one product page or AI-visibility question (async: poll topics.getRun; results land in topics.list)
          * @description Requires scope: `topics:write`. Spends credits (all-or-nothing at execution). The `Idempotency-Key` header is REQUIRED; retries replay the stored result.
          */
         post: operations["topics.suggest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/brands/{brandId}/topics/runs/{runId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * One discovery run: status, the stable error code if it failed, and the suggestions it produced
+         * @description Requires scope: `topics:read`.
+         */
+        get: operations["topics.getRun"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -450,6 +470,7 @@ export interface operations {
                             slug: string;
                             title: string;
                             content_type: string;
+                            article_format: "use_case" | null;
                             /** @enum {string} */
                             status: "draft" | "published";
                             created_at: string;
@@ -489,6 +510,7 @@ export interface operations {
                         slug: string;
                         title: string;
                         content_type: string;
+                        article_format: "use_case" | null;
                         /** @enum {string} */
                         status: "draft" | "published";
                         created_at: string;
@@ -629,7 +651,8 @@ export interface operations {
                                 completed_at: string | null;
                                 failure_reason: string | null;
                             }[];
-                            origin: string | null;
+                            origin: ("manual" | "suggestion" | "search_console" | "bulk_plan" | "ai_visibility" | "meta_ads" | "product_page") | null;
+                            article_format: "use_case" | null;
                             created_at: string;
                         }[];
                         has_more: boolean;
@@ -674,9 +697,7 @@ export interface operations {
                     /** @default null */
                     suggestionId?: string | null;
                     /** @default null */
-                    origin?: ("manual" | "suggestion" | "search_console" | "bulk_plan" | "ai_visibility" | "meta_ads") | null;
-                    /** @default null */
-                    useCaseId?: string | null;
+                    origin?: ("manual" | "search_console" | "meta_ads") | null;
                     /** @default null */
                     recreatedFromJobId?: string | null;
                     /** @default null */
@@ -779,7 +800,8 @@ export interface operations {
                             completed_at: string | null;
                             failure_reason: string | null;
                         }[];
-                        origin: string | null;
+                        origin: ("manual" | "suggestion" | "search_console" | "bulk_plan" | "ai_visibility" | "meta_ads" | "product_page") | null;
+                        article_format: "use_case" | null;
                         created_at: string;
                     };
                 };
@@ -825,11 +847,17 @@ export interface operations {
                         /** @default null */
                         directive?: string | null;
                     } | null;
-                    focus?: {
+                    focus?: ({
                         /** @constant */
                         source: "ai_visibility";
                         promptId: string;
-                    } | null;
+                    } | {
+                        /** @constant */
+                        source: "product_page";
+                        /** Format: uri */
+                        url: string;
+                        note?: string | null;
+                    }) | null;
                 };
             };
         };
@@ -844,6 +872,40 @@ export interface operations {
                         run_id: string;
                         status: string;
                         content_type: string;
+                    };
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    "topics.getRun": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                brandId: string;
+                runId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        run_id: string;
+                        /** @enum {string} */
+                        status: "pending" | "preparing" | "thinking" | "finalizing" | "completed" | "failed";
+                        content_type: string;
+                        error_code: string | null;
+                        credits_refunded: boolean;
+                        suggestion_ids: string[];
+                        created_at: string;
+                        updated_at: string;
                     };
                 };
             };
@@ -882,6 +944,28 @@ export interface operations {
                             suggested_keywords: string[];
                             content_type: string;
                             language: string;
+                            segment: {
+                                label: string;
+                                fit_score: number;
+                            } | null;
+                            article_format: "use_case" | null;
+                            focus: ({
+                                /** @constant */
+                                source: "ai_visibility";
+                                prompt_id: string;
+                                question: string;
+                                language: string;
+                            } | {
+                                /** @constant */
+                                source: "product_page";
+                                url: string;
+                                note: string | null;
+                                product: {
+                                    name: string;
+                                    category: string | null;
+                                    summary: string;
+                                } | null;
+                            }) | null;
                             created_at: string;
                         }[];
                     };

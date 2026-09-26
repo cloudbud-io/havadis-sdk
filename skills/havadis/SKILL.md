@@ -5,17 +5,17 @@ description: Use when integrating a codebase with the Havadis content API — ge
 
 # Havadis API & SDK
 
-Havadis generates brand-aware content (blog, LinkedIn, Instagram, X,
-viral) and this surface lets a backend drive it: create generation jobs,
-read the results (drafts included), publish to the customer's site,
-discover topics.
+Havadis generates brand-aware content (blog, LinkedIn, Instagram,
+Pinterest, X, viral, ad creatives) and this surface lets a backend drive
+it: create generation jobs, read the results (drafts included), publish
+to the customer's site, discover topics.
 
 ## Ground rules
 
 - **Server-side only.** Keys look like `havadis_<prefix>_<secret>` and
   must never reach a browser bundle; the SDK throws if a `window` exists.
 - **Prefer the SDK** (`npm i @havadis/sdk`, Node ≥22.18, ESM). Raw REST
-  base is `https://gethavadis.co/api/v1` with
+  base is `https://api.gethavadis.co/api/v1` with
   `Authorization: Bearer <key>`; machine-readable spec at
   `GET /api/v1/openapi.json`.
 - **Docs ship in the package** — read `node_modules/@havadis/sdk/docs/`
@@ -40,9 +40,18 @@ const scope = havadis.brand(brandId);
    never a raw storage URL).
 3. **Publish**: `scope.contents.publish(contentId)` (v1 channel:
    custom_website only). `warnings` is a stable enum, not prose.
-4. **Topics**: `scope.topics.suggest()` (async) → `scope.topics.list()`.
-5. **Webhooks**: `verifyWebhook(rawBody, headers, whsecSecret)` —
-   Standard Webhooks v1; verify raw bytes BEFORE parsing.
+4. **Topics**: `const { run_id } = await scope.topics.suggest()` (async)
+   → `await scope.topics.waitForRun(run_id)` → `scope.topics.list()`.
+   Pass `focus: { source: 'product_page', url }` for one suggestion per
+   industry the product fits (`segment.fit_score`; blogs become use-case
+   articles, `article_format: 'use_case'`). A failed run throws
+   `TopicRunFailedError` with a stable `errorCode` (e.g.
+   `product_page_unreadable`, credits refunded). Approve a suggestion into
+   a job with `jobs.create({ ..., suggestionId })` — never by copying its
+   brief alone, or its format and research page are lost.
+5. **Webhooks**: `verifyWebhook<SiteRefreshEvent>(rawBody, headers, whsecSecret)`
+   — Standard Webhooks v1; verify raw bytes BEFORE parsing. Use-case
+   articles arrive as `contentType: 'blog'` with `articleFormat: 'use_case'`.
 
 ## Money-safety rules (do not improvise)
 

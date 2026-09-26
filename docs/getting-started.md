@@ -53,7 +53,34 @@ const detail = await scope.contents.get(contentId);
 // detail.aeo_metadata       — featured snippet target + FAQ items
 // detail.geo_metadata       — citations + embeddable JSON-LD
 // detail.cover_image_url    — stable API route; embed as-is
+// detail.article_format     — 'use_case' for a use-case article, else null
 ```
+
+## 5. Discover topics
+
+Discovery is asynchronous: queue a run, wait for it, read the suggestions.
+
+```ts
+const { run_id } = await scope.topics.suggest({
+  contentType: 'blog',
+  // Optional: one suggestion per industry the product fits, each with a
+  // fit score; blogs approved from them are written as use-case articles.
+  focus: { source: 'product_page', url: 'https://yourbrand.com/product' },
+});
+await scope.topics.waitForRun(run_id); // TopicRunFailedError carries errorCode
+const topics = await scope.topics.list({ status: 'pending' });
+
+// Approve one into a job: the suggestion leaves the pending list and its
+// format, origin and product page carry over.
+await scope.jobs.createAndWait({
+  contentTypes: ['blog'],
+  brief: topics[0].suggested_brief,
+  suggestionId: topics[0].id,
+});
+```
+
+A page Havadis cannot read fails the run with
+`error_code: 'product_page_unreadable'`, and its credits are refunded.
 
 ## Limits you will meet
 

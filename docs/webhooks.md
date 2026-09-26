@@ -16,12 +16,20 @@ dashboard.
 ## Verifying
 
 ```ts
-import { verifyWebhook, WebhookVerificationError } from '@havadis/sdk';
+import {
+  verifyWebhook,
+  WebhookVerificationError,
+  type SiteRefreshEvent,
+} from '@havadis/sdk';
 
 app.post('/hooks/havadis', express.raw({ type: '*/*' }), (req, res) => {
   try {
-    const event = verifyWebhook(req.body, req.headers, process.env.HAVADIS_WEBHOOK_SECRET!);
-    // { event: 'content.published', contentId, contentType, slug, title }
+    const event = verifyWebhook<SiteRefreshEvent>(
+      req.body,
+      req.headers,
+      process.env.HAVADIS_WEBHOOK_SECRET!,
+    );
+    // { event: 'content.published', contentId, contentType, articleFormat, slug, title }
     revalidate(event.slug);
     res.sendStatus(204);
   } catch (err) {
@@ -47,3 +55,14 @@ Rules the verifier enforces for you:
 
 Deliveries can repeat (retries). `webhook-id` is stable per event — treat
 it as your dedupe key.
+
+## Payload
+
+| Field | Notes |
+| --- | --- |
+| `event` | `content.published` or `content.unpublished` |
+| `contentId` | Stable id; fetch the content with `contents.get(contentId)` |
+| `contentType` | `blog`, `linkedin`, … |
+| `articleFormat` | `use_case` for a use-case article (a blog), else `null` |
+| `slug` | The path your site serves it under |
+| `title` | `content.published` only |

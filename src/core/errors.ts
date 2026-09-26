@@ -114,6 +114,33 @@ export class JobTimeoutError extends Error {
   }
 }
 
+/**
+ * Raised locally by `topics.waitForRun` — not a wire error. `errorCode` is
+ * the run's stable failure code (e.g. `product_page_unreadable`), null when
+ * the server could not classify it.
+ */
+export class TopicRunFailedError extends Error {
+  readonly errorCode: string | null;
+  readonly creditsRefunded: boolean;
+  constructor(
+    readonly runId: string,
+    readonly run: { error_code: string | null; credits_refunded: boolean },
+  ) {
+    super(
+      `Topic discovery run ${runId} failed${run.error_code ? ` (${run.error_code})` : ''}`,
+    );
+    this.name = 'TopicRunFailedError';
+    this.errorCode = run.error_code;
+    this.creditsRefunded = run.credits_refunded;
+  }
+}
+export class TopicRunTimeoutError extends Error {
+  constructor(readonly runId: string) {
+    super(`Timed out waiting for topic discovery run ${runId}`);
+    this.name = 'TopicRunTimeoutError';
+  }
+}
+
 function numberOf(value: unknown): number | null {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }

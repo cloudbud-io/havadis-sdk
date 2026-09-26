@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "Havadis API",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Keyed REST façade over Havadis content generation. Authenticate with `Authorization: Bearer havadis_<prefix>_<secret>`. Errors use a closed envelope with stable `code` values."
   },
   "servers": [
@@ -466,6 +466,19 @@
                           "content_type": {
                             "type": "string"
                           },
+                          "article_format": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "use_case"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "status": {
                             "type": "string",
                             "enum": [
@@ -505,6 +518,7 @@
                           "slug",
                           "title",
                           "content_type",
+                          "article_format",
                           "status",
                           "created_at",
                           "updated_at",
@@ -594,6 +608,19 @@
                     },
                     "content_type": {
                       "type": "string"
+                    },
+                    "article_format": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "use_case"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
                     },
                     "status": {
                       "type": "string",
@@ -736,6 +763,7 @@
                     "slug",
                     "title",
                     "content_type",
+                    "article_format",
                     "status",
                     "created_at",
                     "updated_at",
@@ -990,6 +1018,7 @@
                     "type": "array",
                     "items": {
                       "type": "string",
+                      "maxLength": 2048,
                       "format": "uri"
                     }
                   },
@@ -999,6 +1028,7 @@
                     "type": "array",
                     "items": {
                       "type": "string",
+                      "maxLength": 2048,
                       "format": "uri"
                     }
                   },
@@ -1079,23 +1109,9 @@
                         "type": "string",
                         "enum": [
                           "manual",
-                          "suggestion",
                           "search_console",
-                          "bulk_plan",
-                          "ai_visibility",
                           "meta_ads"
                         ]
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "useCaseId": {
-                    "default": null,
-                    "anyOf": [
-                      {
-                        "type": "string"
                       },
                       {
                         "type": "null"
@@ -1197,6 +1213,7 @@
                     "anyOf": [
                       {
                         "type": "string",
+                        "maxLength": 2048,
                         "format": "uri"
                       },
                       {
@@ -1380,7 +1397,29 @@
                           "origin": {
                             "anyOf": [
                               {
-                                "type": "string"
+                                "type": "string",
+                                "enum": [
+                                  "manual",
+                                  "suggestion",
+                                  "search_console",
+                                  "bulk_plan",
+                                  "ai_visibility",
+                                  "meta_ads",
+                                  "product_page"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "article_format": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "use_case"
+                                ]
                               },
                               {
                                 "type": "null"
@@ -1397,6 +1436,7 @@
                           "content_types",
                           "platforms",
                           "origin",
+                          "article_format",
                           "created_at"
                         ]
                       }
@@ -1615,7 +1655,29 @@
                     "origin": {
                       "anyOf": [
                         {
-                          "type": "string"
+                          "type": "string",
+                          "enum": [
+                            "manual",
+                            "suggestion",
+                            "search_console",
+                            "bulk_plan",
+                            "ai_visibility",
+                            "meta_ads",
+                            "product_page"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "article_format": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "enum": [
+                            "use_case"
+                          ]
                         },
                         {
                           "type": "null"
@@ -1632,6 +1694,7 @@
                     "content_types",
                     "platforms",
                     "origin",
+                    "article_format",
                     "created_at"
                   ]
                 }
@@ -1647,7 +1710,7 @@
     "/api/v1/brands/{brandId}/topics/suggest": {
       "post": {
         "operationId": "topics.suggest",
-        "summary": "Queue topic discovery (async — results land in topics.list)",
+        "summary": "Queue topic discovery — brand-wide, or focused on one product page or AI-visibility question (async: poll topics.getRun; results land in topics.list)",
         "description": "Requires scope: `topics:write`. Spends credits (all-or-nothing at execution). The `Idempotency-Key` header is REQUIRED; retries replay the stored result.",
         "security": [
           {
@@ -1728,6 +1791,7 @@
                     "anyOf": [
                       {
                         "type": "string",
+                        "maxLength": 2048,
                         "format": "uri"
                       },
                       {
@@ -1834,23 +1898,57 @@
                   "focus": {
                     "anyOf": [
                       {
-                        "type": "object",
-                        "properties": {
-                          "source": {
-                            "type": "string",
-                            "const": "ai_visibility"
+                        "oneOf": [
+                          {
+                            "type": "object",
+                            "properties": {
+                              "source": {
+                                "type": "string",
+                                "const": "ai_visibility"
+                              },
+                              "promptId": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 64
+                              }
+                            },
+                            "required": [
+                              "source",
+                              "promptId"
+                            ],
+                            "additionalProperties": false
                           },
-                          "promptId": {
-                            "type": "string",
-                            "minLength": 1,
-                            "maxLength": 64
+                          {
+                            "type": "object",
+                            "properties": {
+                              "source": {
+                                "type": "string",
+                                "const": "product_page"
+                              },
+                              "url": {
+                                "type": "string",
+                                "maxLength": 2048,
+                                "format": "uri"
+                              },
+                              "note": {
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "maxLength": 500
+                                  },
+                                  {
+                                    "type": "null"
+                                  }
+                                ]
+                              }
+                            },
+                            "required": [
+                              "source",
+                              "url"
+                            ],
+                            "additionalProperties": false
                           }
-                        },
-                        "required": [
-                          "source",
-                          "promptId"
-                        ],
-                        "additionalProperties": false
+                        ]
                       },
                       {
                         "type": "null"
@@ -1885,6 +1983,105 @@
                     "run_id",
                     "status",
                     "content_type"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/brands/{brandId}/topics/runs/{runId}": {
+      "get": {
+        "operationId": "topics.getRun",
+        "summary": "One discovery run: status, the stable error code if it failed, and the suggestions it produced",
+        "description": "Requires scope: `topics:read`.",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "runId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "run_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "preparing",
+                        "thinking",
+                        "finalizing",
+                        "completed",
+                        "failed"
+                      ]
+                    },
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "error_code": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "credits_refunded": {
+                      "type": "boolean"
+                    },
+                    "suggestion_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "created_at": {
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "run_id",
+                    "status",
+                    "content_type",
+                    "error_code",
+                    "credits_refunded",
+                    "suggestion_ids",
+                    "created_at",
+                    "updated_at"
                   ]
                 }
               }
@@ -1988,6 +2185,139 @@
                           "language": {
                             "type": "string"
                           },
+                          "segment": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "label": {
+                                    "type": "string"
+                                  },
+                                  "fit_score": {
+                                    "type": "number",
+                                    "minimum": 0,
+                                    "maximum": 1
+                                  }
+                                },
+                                "required": [
+                                  "label",
+                                  "fit_score"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "article_format": {
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "enum": [
+                                  "use_case"
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
+                          "focus": {
+                            "anyOf": [
+                              {
+                                "oneOf": [
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "source": {
+                                        "type": "string",
+                                        "const": "ai_visibility"
+                                      },
+                                      "prompt_id": {
+                                        "type": "string"
+                                      },
+                                      "question": {
+                                        "type": "string"
+                                      },
+                                      "language": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "source",
+                                      "prompt_id",
+                                      "question",
+                                      "language"
+                                    ]
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "source": {
+                                        "type": "string",
+                                        "const": "product_page"
+                                      },
+                                      "url": {
+                                        "type": "string"
+                                      },
+                                      "note": {
+                                        "anyOf": [
+                                          {
+                                            "type": "string"
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      },
+                                      "product": {
+                                        "anyOf": [
+                                          {
+                                            "type": "object",
+                                            "properties": {
+                                              "name": {
+                                                "type": "string"
+                                              },
+                                              "category": {
+                                                "anyOf": [
+                                                  {
+                                                    "type": "string"
+                                                  },
+                                                  {
+                                                    "type": "null"
+                                                  }
+                                                ]
+                                              },
+                                              "summary": {
+                                                "type": "string"
+                                              }
+                                            },
+                                            "required": [
+                                              "name",
+                                              "category",
+                                              "summary"
+                                            ]
+                                          },
+                                          {
+                                            "type": "null"
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "source",
+                                      "url",
+                                      "note",
+                                      "product"
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "null"
+                              }
+                            ]
+                          },
                           "created_at": {
                             "type": "string"
                           }
@@ -2002,6 +2332,9 @@
                           "suggested_keywords",
                           "content_type",
                           "language",
+                          "segment",
+                          "article_format",
+                          "focus",
                           "created_at"
                         ]
                       }
