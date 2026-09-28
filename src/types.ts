@@ -203,7 +203,11 @@ export interface TopicRun {
    * Null otherwise; the raw provider message is never exposed.
    */
   error_code: string | null;
-  /** True once a failed run's charge has been returned. */
+  /**
+   * True once the run's charge, or part of it, has been returned: all of it
+   * for a failed run, the missing share for a counted run that delivered
+   * fewer suggestions than it was asked for.
+   */
   credits_refunded: boolean;
   /** The suggestions it produced; read them with `topics.list()`. */
   suggestion_ids: string[];
@@ -241,6 +245,13 @@ export interface SuggestTopicsParams {
   /** Ad creative runs/jobs: `{ objective, conceptCount }`; ignored for other types. */
   adOptions?: Record<string, unknown> | null;
   focus?: SuggestTopicsFocus | null;
+  /**
+   * Brand-wide runs only: how many suggestions to generate (3-31) instead of
+   * the default three, e.g. one per day of a content plan. Charged pro rata
+   * per suggestion, and refunded for any the run does not deliver. A focused
+   * run decides its own count and refuses this field.
+   */
+  count?: number;
 }
 
 export interface PublishParams {

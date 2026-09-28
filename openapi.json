@@ -1729,7 +1729,7 @@
     "/api/v1/brands/{brandId}/topics/suggest": {
       "post": {
         "operationId": "topics.suggest",
-        "summary": "Queue topic discovery — brand-wide, or focused on one product page or AI-visibility question (async: poll topics.getRun; results land in topics.list)",
+        "summary": "Queue topic discovery — brand-wide, or focused on one product page or AI-visibility question (async: poll topics.getRun; results land in topics.list). A brand-wide run takes a `count` of suggestions, charged pro rata per suggestion",
         "description": "Requires scope: `topics:write`. Spends credits (all-or-nothing at execution). The `Idempotency-Key` header is REQUIRED; retries replay the stored result.",
         "security": [
           {
@@ -1973,6 +1973,11 @@
                         "type": "null"
                       }
                     ]
+                  },
+                  "count": {
+                    "type": "integer",
+                    "minimum": 3,
+                    "maximum": 31
                   }
                 },
                 "additionalProperties": false

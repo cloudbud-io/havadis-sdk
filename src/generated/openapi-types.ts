@@ -238,7 +238,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Queue topic discovery — brand-wide, or focused on one product page or AI-visibility question (async: poll topics.getRun; results land in topics.list)
+         * Queue topic discovery — brand-wide, or focused on one product page or AI-visibility question (async: poll topics.getRun; results land in topics.list). A brand-wide run takes a `count` of suggestions, charged pro rata per suggestion
          * @description Requires scope: `topics:write`. Spends credits (all-or-nothing at execution). The `Idempotency-Key` header is REQUIRED; retries replay the stored result.
          */
         post: operations["topics.suggest"];
@@ -860,6 +860,7 @@ export interface operations {
                         url: string;
                         note?: string | null;
                     }) | null;
+                    count?: number;
                 };
             };
         };
