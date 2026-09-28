@@ -373,6 +373,8 @@ export interface operations {
                     "application/json": {
                         balance: number | null;
                         is_unlimited: boolean;
+                        expiring_credits: number;
+                        expiring_at: string | null;
                         plan: string;
                         daily_credit_cap: number;
                     };

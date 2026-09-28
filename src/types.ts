@@ -263,6 +263,13 @@ export interface Me {
 export interface Credits {
   balance: number | null;
   is_unlimited: boolean;
+  /**
+   * The part of `balance` that is trial credit on a deadline. Spent first;
+   * whatever is left is taken back at `expiring_at`.
+   */
+  expiring_credits: number;
+  /** ISO-8601. Null when nothing is on a deadline. */
+  expiring_at: string | null;
   plan: string;
   daily_credit_cap: number;
 }
