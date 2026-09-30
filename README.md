@@ -1,6 +1,6 @@
 # @havadis/sdk
 
-Typed Node.js SDK for the [Havadis](https://gethavadis.co) REST API — AI
+Typed Node.js SDK for the [Havadis](https://gethavadis.co/?from=sdk-readme) REST API — AI
 content generation, topic discovery and publishing for your brand, from
 your own backend, cron jobs and build pipelines.
 
@@ -71,7 +71,7 @@ const event = verifyWebhook(rawBody, req.headers, process.env.HAVADIS_WEBHOOK_SE
 
 Full guides ship inside the package under
 [`docs/`](./docs) (`node_modules/@havadis/sdk/docs/`) and live at
-[gethavadis.co/developers](https://gethavadis.co/developers). The OpenAPI
+[gethavadis.co/developers](https://gethavadis.co/developers?from=sdk-readme). The OpenAPI
 document the types are generated from is committed as
 [`openapi.json`](./openapi.json).
 

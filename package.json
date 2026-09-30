@@ -7,7 +7,7 @@
     "type": "git",
     "url": "git+https://github.com/cloudbud-io/havadis-sdk.git"
   },
-  "homepage": "https://gethavadis.co/developers",
+  "homepage": "https://gethavadis.co/developers?from=npm",
   "type": "module",
   "engines": {
     "node": ">=22.18"
