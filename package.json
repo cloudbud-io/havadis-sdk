@@ -1,6 +1,6 @@
 {
   "name": "@havadis/sdk",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Typed Node.js SDK for the Havadis REST API. Havadis is an AI content engine for organic growth: topic discovery, SEO, AEO and GEO content, publishing.",
   "license": "MIT",
   "repository": {

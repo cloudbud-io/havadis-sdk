@@ -85,6 +85,7 @@
       "idempotency_key_required",
       "idempotency_error",
       "idempotency_in_flight",
+      "service_unavailable",
       "internal_error"
     ]
   },

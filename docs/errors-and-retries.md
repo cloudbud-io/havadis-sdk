@@ -16,7 +16,7 @@ HTTP `status` and a `requestId` to quote at support.
 | `InsufficientCreditsError` | `insufficient_credits`, `owner_insufficient_credits` | `requiredCredits`, `availableCredits` |
 | `IdempotencyError` | `idempotency_key_required`, `idempotency_error` | — |
 | `IdempotencyInFlightError` | `idempotency_in_flight` | `retryAfterSeconds` |
-| `ApiError` | anything else / 5xx | — |
+| `ApiError` | `service_unavailable` (503, retried automatically after its `Retry-After`), `internal_error`, anything else / 5xx | — |
 
 `JobFailedError` / `JobCancelledError` / `JobTimeoutError` come from
 `jobs.waitFor` and carry the final job snapshot.
