@@ -160,6 +160,15 @@ export type TopicFocus =
         category: string | null;
         summary: string;
       } | null;
+    }
+  | {
+      source: 'search_console';
+      /**
+       * The topic from the brand's Search Console coverage list (a product,
+       * category or subject from its brand analysis) the run wrote for.
+       */
+      topic: string;
+      language: string;
     };
 
 export interface TopicSuggestion {
@@ -232,6 +241,18 @@ export type SuggestTopicsFocus =
       /** One of the brand's AI-visibility questions. */
       source: 'ai_visibility';
       promptId: string;
+    }
+  | {
+      /**
+       * One topic from the brand's Search Console topic coverage (a product,
+       * category or subject from its brand analysis, measured against the
+       * connected Search Console property). Suggestions answer the real
+       * searches behind it. A topic not in the current coverage list is
+       * refused with `search_console_topic_not_found`, before any charge.
+       */
+      source: 'search_console';
+      /** 1-120 characters; matched ignoring case and accents. */
+      topic: string;
     };
 
 export interface SuggestTopicsParams {
