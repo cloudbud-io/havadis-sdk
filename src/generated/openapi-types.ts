@@ -603,7 +603,7 @@ export interface operations {
                         warnings: string[];
                         site_refresh?: {
                             /** @enum {string} */
-                            reason: "wrong_address" | "signature_rejected" | "site_error" | "redirected" | "address_refused" | "unreachable";
+                            reason: "wrong_address" | "signature_rejected" | "site_error" | "redirected" | "address_refused" | "unreachable" | "not_sent";
                             http_status: number | null;
                         };
                     };
@@ -641,7 +641,7 @@ export interface operations {
                         warnings: string[];
                         site_refresh?: {
                             /** @enum {string} */
-                            reason: "wrong_address" | "signature_rejected" | "site_error" | "redirected" | "address_refused" | "unreachable";
+                            reason: "wrong_address" | "signature_rejected" | "site_error" | "redirected" | "address_refused" | "unreachable" | "not_sent";
                             http_status: number | null;
                         };
                     };

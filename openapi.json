@@ -893,7 +893,8 @@
                             "site_error",
                             "redirected",
                             "address_refused",
-                            "unreachable"
+                            "unreachable",
+                            "not_sent"
                           ]
                         },
                         "http_status": {
@@ -1004,7 +1005,8 @@
                             "site_error",
                             "redirected",
                             "address_refused",
-                            "unreachable"
+                            "unreachable",
+                            "not_sent"
                           ]
                         },
                         "http_status": {

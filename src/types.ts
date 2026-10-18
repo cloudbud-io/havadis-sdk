@@ -289,6 +289,7 @@ export type SiteRefreshFailure =
   | 'redirected'
   | 'address_refused'
   | 'unreachable'
+  | 'not_sent'
   | (string & {});
 
 export interface PublishResult {
@@ -346,21 +347,9 @@ export interface Credits {
   daily_credit_cap: number;
 }
 
-/**
- * The site-refresh ping Havadis sends a connected website when content is
- * published or taken down (see docs/webhooks.md). Read it with
- * `verifyWebhook<SiteRefreshEvent>(...)`.
- */
-export interface SiteRefreshEvent {
-  /**
-   * `webhook.test` comes from the dashboard's test button and carries only
-   * `sentAt`: answer it 2xx and ignore it.
-   */
-  event:
-    | 'content.published'
-    | 'content.unpublished'
-    | 'webhook.test'
-    | (string & {});
+/** A post went live on, or was taken off, the channel your site serves. */
+export interface SiteContentEvent {
+  event: 'content.published' | 'content.unpublished';
   contentId: string;
   contentType: string;
   /** A blog's article format (`use_case`); null on everything else. */
@@ -369,3 +358,20 @@ export interface SiteRefreshEvent {
   /** Sent with `content.published`. */
   title?: string;
 }
+
+/**
+ * Sent by the dashboard's "Send test" button. Answer it with a 2xx and
+ * ignore it; it only proves the address and the secret work.
+ */
+export interface SiteWebhookTestEvent {
+  event: 'webhook.test';
+  /** ISO-8601. */
+  sentAt: string;
+}
+
+/**
+ * The webhook Havadis sends a connected website (see docs/webhooks.md).
+ * Read it with `verifyWebhook<SiteRefreshEvent>(...)` and switch on
+ * `event`; an event you do not know deserves a 2xx too.
+ */
+export type SiteRefreshEvent = SiteContentEvent | SiteWebhookTestEvent;
