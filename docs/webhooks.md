@@ -29,6 +29,8 @@ app.post('/hooks/havadis', express.raw({ type: '*/*' }), (req, res) => {
       req.headers,
       process.env.HAVADIS_WEBHOOK_SECRET!,
     );
+    // A test from the dashboard only proves the address and the secret.
+    if (event.event === 'webhook.test') return res.sendStatus(204);
     // { event: 'content.published', contentId, contentType, articleFormat, slug, title }
     revalidate(event.slug);
     res.sendStatus(204);
@@ -125,11 +127,12 @@ The connection row in the dashboard shows how the last delivery went:
 | Reason | What to check |
 | --- | --- |
 | `wrong_address` (404, 405, 410) | The address answers, but nothing there takes the webhook. Enter your receiver's address on the connection. |
-| `signature_rejected` (401, 403) | Your receiver's secret is not this connection's `whsec_…` secret. |
+| `signature_rejected` (401, 403) | Your receiver's secret is not this connection's `whsec_…` secret (for a GitHub dispatch: the token was refused). |
 | `redirected` | The address redirects. Enter the address it redirects to. |
 | `address_refused` | Not `https`, or not a public address. |
 | `site_error` | Your receiver answered with another error. |
 | `unreachable` | No answer within 10 seconds, or the host could not be reached. |
+| `not_sent` | Havadis could not prepare the delivery. Try again in a moment. |
 
 A publish whose webhook failed answers with the same reason in
 `site_refresh` (`{ reason, http_status }`).
