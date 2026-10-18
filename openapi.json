@@ -3,7 +3,7 @@
   "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
   "info": {
     "title": "Havadis API",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Keyed REST façade over Havadis content generation. Authenticate with `Authorization: Bearer havadis_<prefix>_<secret>`. Errors use a closed envelope with stable `code` values."
   },
   "servers": [
@@ -77,6 +77,8 @@
       "brand_not_found",
       "not_found",
       "channel_not_supported",
+      "content_not_on_site",
+      "site_url_not_on_site",
       "rate_limit_exceeded",
       "daily_spend_cap_exceeded",
       "insufficient_credits",
@@ -879,6 +881,38 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "site_refresh": {
+                      "type": "object",
+                      "properties": {
+                        "reason": {
+                          "type": "string",
+                          "enum": [
+                            "wrong_address",
+                            "signature_rejected",
+                            "site_error",
+                            "redirected",
+                            "address_refused",
+                            "unreachable"
+                          ]
+                        },
+                        "http_status": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "reason",
+                        "http_status"
+                      ]
                     }
                   },
                   "required": [
@@ -958,11 +992,158 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "site_refresh": {
+                      "type": "object",
+                      "properties": {
+                        "reason": {
+                          "type": "string",
+                          "enum": [
+                            "wrong_address",
+                            "signature_rejected",
+                            "site_error",
+                            "redirected",
+                            "address_refused",
+                            "unreachable"
+                          ]
+                        },
+                        "http_status": {
+                          "anyOf": [
+                            {
+                              "type": "integer",
+                              "minimum": -9007199254740991,
+                              "maximum": 9007199254740991
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "reason",
+                        "http_status"
+                      ]
                     }
                   },
                   "required": [
                     "published",
                     "warnings"
+                  ]
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Error"
+          }
+        }
+      }
+    },
+    "/api/v1/brands/{brandId}/contents/{contentId}/site-publication": {
+      "post": {
+        "operationId": "contents.reportSitePublication",
+        "summary": "Report where your site published a post Havadis sent it, or that it holds it",
+        "description": "Requires scope: `content:write`.",
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "brandId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "published",
+                      "draft"
+                    ],
+                    "description": "'published' when the post is live on the site, 'draft' while the site holds it (a draft or an approval queue)."
+                  },
+                  "url": {
+                    "description": "The live post's address on the site the content was published to. Ignored on a draft.",
+                    "type": "string",
+                    "maxLength": 2048,
+                    "format": "uri"
+                  },
+                  "editUrl": {
+                    "description": "Where the site's own editor opens the post (https).",
+                    "type": "string",
+                    "maxLength": 2048,
+                    "format": "uri"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "published",
+                        "draft"
+                      ]
+                    },
+                    "url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "edit_url": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "url",
+                    "edit_url"
                   ]
                 }
               }
@@ -1730,7 +1911,7 @@
     "/api/v1/brands/{brandId}/topics/suggest": {
       "post": {
         "operationId": "topics.suggest",
-        "summary": "Queue topic discovery — brand-wide, or focused on one product page or AI-visibility question (async: poll topics.getRun; results land in topics.list). A brand-wide run takes a `count` of suggestions, charged pro rata per suggestion",
+        "summary": "Queue topic discovery — brand-wide, or focused on one product page, one AI-visibility question or one Search Console topic (async: poll topics.getRun; results land in topics.list). A brand-wide run takes a `count` of suggestions, charged pro rata per suggestion",
         "description": "Requires scope: `topics:write`. Spends credits (all-or-nothing at execution). The `Idempotency-Key` header is REQUIRED; retries replay the stored result.",
         "security": [
           {
@@ -1965,6 +2146,25 @@
                             "required": [
                               "source",
                               "url"
+                            ],
+                            "additionalProperties": false
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "source": {
+                                "type": "string",
+                                "const": "search_console"
+                              },
+                              "topic": {
+                                "type": "string",
+                                "minLength": 1,
+                                "maxLength": 120
+                              }
+                            },
+                            "required": [
+                              "source",
+                              "topic"
                             ],
                             "additionalProperties": false
                           }
@@ -2334,6 +2534,26 @@
                                       "url",
                                       "note",
                                       "product"
+                                    ]
+                                  },
+                                  {
+                                    "type": "object",
+                                    "properties": {
+                                      "source": {
+                                        "type": "string",
+                                        "const": "search_console"
+                                      },
+                                      "topic": {
+                                        "type": "string"
+                                      },
+                                      "language": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "source",
+                                      "topic",
+                                      "language"
                                     ]
                                   }
                                 ]

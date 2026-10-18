@@ -6,6 +6,8 @@ import type {
   Job,
   KeysetPage,
   Me,
+  PublishResult,
+  SitePublicationResult,
   TopicRun,
   TopicSuggestion,
 } from '../src/types.js';
@@ -45,6 +47,12 @@ type GeneratedTopic = Ok200<
 type GeneratedTopicRun = Ok200<
   paths['/api/v1/brands/{brandId}/topics/runs/{runId}']['get']
 >;
+type GeneratedPublishResult = Ok200<
+  paths['/api/v1/brands/{brandId}/contents/{contentId}/publish']['post']
+>;
+type GeneratedSitePublication = Ok200<
+  paths['/api/v1/brands/{brandId}/contents/{contentId}/site-publication']['post']
+>;
 
 // Assignability both ways = the shapes agree.
 type Extends<A, B> = A extends B ? true : never;
@@ -73,6 +81,16 @@ const summaryKeys: NoMissingKeys<
 > = true;
 const topicKeys: NoMissingKeys<GeneratedTopic, TopicSuggestion> = true;
 const runKeys: NoMissingKeys<GeneratedTopicRun, TopicRun> = true;
+const publishForward: Extends<GeneratedPublishResult, PublishResult> = true;
+const publishKeys: NoMissingKeys<GeneratedPublishResult, PublishResult> = true;
+const sitePublicationForward: Extends<
+  GeneratedSitePublication,
+  SitePublicationResult
+> = true;
+const sitePublicationBackward: Extends<
+  SitePublicationResult,
+  GeneratedSitePublication
+> = true;
 
 describe('generated ⇄ curated type drift', () => {
   it('compiles — the assertions above ARE the test', () => {
@@ -89,6 +107,10 @@ describe('generated ⇄ curated type drift', () => {
       summaryKeys,
       topicKeys,
       runKeys,
+      publishForward,
+      publishKeys,
+      sitePublicationForward,
+      sitePublicationBackward,
     ];
     expect(checks.every((check) => check === true)).toBe(true);
   });

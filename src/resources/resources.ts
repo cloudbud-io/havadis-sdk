@@ -22,6 +22,8 @@ import type {
   Me,
   PublishParams,
   PublishResult,
+  SitePublication,
+  SitePublicationResult,
   SuggestTopicsParams,
   TopicRun,
   TopicSuggestion,
@@ -142,6 +144,25 @@ export class ContentsResource extends BaseResource {
       method: 'POST',
       path: `/api/v1/brands/${this.brandId}/contents/${contentId}/unpublish`,
       body: { channel: 'custom_website' },
+      signal: options?.signal,
+    });
+  }
+
+  /**
+   * Tell Havadis where your site published a post it sent you, or that the
+   * site holds it. For a site that publishes later than the webhook (after
+   * an approval queue); one that knows at once can answer the webhook with
+   * the same fields instead. The address must be on your connected site.
+   */
+  reportSitePublication(
+    contentId: string,
+    publication: SitePublication,
+    options?: { signal?: AbortSignal },
+  ): Promise<SitePublicationResult> {
+    return requestOrThrow(this.transport, {
+      method: 'POST',
+      path: `/api/v1/brands/${this.brandId}/contents/${encodeURIComponent(contentId)}/site-publication`,
+      body: publication,
       signal: options?.signal,
     });
   }

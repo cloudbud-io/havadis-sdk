@@ -85,6 +85,56 @@ describe('Havadis client', () => {
   });
 });
 
+describe('contents.reportSitePublication', () => {
+  it('posts the site report to the content, answered in the wire casing', async () => {
+    const transport = fakeTransport(() => ({
+      status: 200,
+      body: {
+        status: 'published',
+        url: 'https://acme.com/blog/post',
+        edit_url: null,
+      },
+    }));
+    const client = new Havadis({ apiKey: API_KEY, transport });
+
+    const out = await client
+      .brand('b1')
+      .contents.reportSitePublication('c1', {
+        status: 'published',
+        url: 'https://acme.com/blog/post',
+      });
+
+    expect(transport.calls[0]).toMatchObject({
+      method: 'POST',
+      path: '/api/v1/brands/b1/contents/c1/site-publication',
+      body: { status: 'published', url: 'https://acme.com/blog/post' },
+    });
+    expect(out).toEqual({
+      status: 'published',
+      url: 'https://acme.com/blog/post',
+      edit_url: null,
+    });
+  });
+
+  it('surfaces a refused report as an invalid request carrying its code', async () => {
+    const transport = fakeTransport(() => ({
+      status: 409,
+      body: {
+        error: {
+          type: 'invalid_request_error',
+          code: 'content_not_on_site',
+          message: 'This content has not been published to your website.',
+        },
+      },
+    }));
+    const client = new Havadis({ apiKey: API_KEY, transport });
+
+    await expect(
+      client.brand('b1').contents.reportSitePublication('c1', { status: 'draft' }),
+    ).rejects.toMatchObject({ name: 'InvalidRequestError', code: 'content_not_on_site' });
+  });
+});
+
 describe('topics', () => {
   it('suggest sends the focus as given, with an idempotency key', async () => {
     const transport = fakeTransport(() => ({

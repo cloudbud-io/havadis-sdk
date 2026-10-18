@@ -281,9 +281,49 @@ export interface PublishParams {
   coverImageUrl?: string;
 }
 
+/** Why Havadis could not refresh your site after a publish. */
+export type SiteRefreshFailure =
+  | 'wrong_address'
+  | 'signature_rejected'
+  | 'site_error'
+  | 'redirected'
+  | 'address_refused'
+  | 'unreachable'
+  | (string & {});
+
 export interface PublishResult {
   published: boolean;
   warnings: string[];
+  /** Set with `site_refresh_not_triggered`: why the site was not refreshed. */
+  site_refresh?: {
+    reason: SiteRefreshFailure;
+    /** Your site's answer, or null when there was none. */
+    http_status: number | null;
+  };
+}
+
+/** Whether your site put a post live, or holds it (a draft, an approval queue). */
+export type SitePublicationStatus = 'published' | 'draft';
+
+/**
+ * What your site tells Havadis about a post it received: as the answer to a
+ * `content.published` webhook, or later through
+ * `contents.reportSitePublication`. Every field is optional in a webhook
+ * answer; an answer that says nothing keeps today's behaviour.
+ */
+export interface SitePublication {
+  status: SitePublicationStatus;
+  /** The live post's address on your site. Ignored on a draft. */
+  url?: string;
+  /** Where your site's own editor opens the post (https). */
+  editUrl?: string;
+}
+
+/** What Havadis recorded, after checking the address is on your site. */
+export interface SitePublicationResult {
+  status: SitePublicationStatus;
+  url: string | null;
+  edit_url: string | null;
 }
 
 export interface Me {
@@ -312,7 +352,15 @@ export interface Credits {
  * `verifyWebhook<SiteRefreshEvent>(...)`.
  */
 export interface SiteRefreshEvent {
-  event: 'content.published' | 'content.unpublished' | (string & {});
+  /**
+   * `webhook.test` comes from the dashboard's test button and carries only
+   * `sentAt`: answer it 2xx and ignore it.
+   */
+  event:
+    | 'content.published'
+    | 'content.unpublished'
+    | 'webhook.test'
+    | (string & {});
   contentId: string;
   contentType: string;
   /** A blog's article format (`use_case`); null on everything else. */

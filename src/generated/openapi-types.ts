@@ -164,6 +164,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/brands/{brandId}/contents/{contentId}/site-publication": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Report where your site published a post Havadis sent it, or that it holds it
+         * @description Requires scope: `content:write`.
+         */
+        post: operations["contents.reportSitePublication"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/brands/{brandId}/jobs": {
         parameters: {
             query?: never;
@@ -238,7 +258,7 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Queue topic discovery — brand-wide, or focused on one product page or AI-visibility question (async: poll topics.getRun; results land in topics.list). A brand-wide run takes a `count` of suggestions, charged pro rata per suggestion
+         * Queue topic discovery — brand-wide, or focused on one product page, one AI-visibility question or one Search Console topic (async: poll topics.getRun; results land in topics.list). A brand-wide run takes a `count` of suggestions, charged pro rata per suggestion
          * @description Requires scope: `topics:write`. Spends credits (all-or-nothing at execution). The `Idempotency-Key` header is REQUIRED; retries replay the stored result.
          */
         post: operations["topics.suggest"];
@@ -581,6 +601,11 @@ export interface operations {
                     "application/json": {
                         published: boolean;
                         warnings: string[];
+                        site_refresh?: {
+                            /** @enum {string} */
+                            reason: "wrong_address" | "signature_rejected" | "site_error" | "redirected" | "address_refused" | "unreachable";
+                            http_status: number | null;
+                        };
                     };
                 };
             };
@@ -614,6 +639,60 @@ export interface operations {
                     "application/json": {
                         published: boolean;
                         warnings: string[];
+                        site_refresh?: {
+                            /** @enum {string} */
+                            reason: "wrong_address" | "signature_rejected" | "site_error" | "redirected" | "address_refused" | "unreachable";
+                            http_status: number | null;
+                        };
+                    };
+                };
+            };
+            default: components["responses"]["Error"];
+        };
+    };
+    "contents.reportSitePublication": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                brandId: string;
+                contentId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description 'published' when the post is live on the site, 'draft' while the site holds it (a draft or an approval queue).
+                     * @enum {string}
+                     */
+                    status: "published" | "draft";
+                    /**
+                     * Format: uri
+                     * @description The live post's address on the site the content was published to. Ignored on a draft.
+                     */
+                    url?: string;
+                    /**
+                     * Format: uri
+                     * @description Where the site's own editor opens the post (https).
+                     */
+                    editUrl?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Success */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "published" | "draft";
+                        url: string | null;
+                        edit_url: string | null;
                     };
                 };
             };
@@ -859,6 +938,10 @@ export interface operations {
                         /** Format: uri */
                         url: string;
                         note?: string | null;
+                    } | {
+                        /** @constant */
+                        source: "search_console";
+                        topic: string;
                     }) | null;
                     count?: number;
                 };
@@ -968,6 +1051,11 @@ export interface operations {
                                     category: string | null;
                                     summary: string;
                                 } | null;
+                            } | {
+                                /** @constant */
+                                source: "search_console";
+                                topic: string;
+                                language: string;
                             }) | null;
                             created_at: string;
                         }[];
