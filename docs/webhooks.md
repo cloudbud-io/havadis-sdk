@@ -82,14 +82,23 @@ the route the Next.js starter serves. If your receiver lives anywhere else
 connection; the default address will otherwise answer `404` or `405` and
 your site will not hear about new posts.
 
+A site that pulls the feed needs no webhook. Failures of the default
+address are shown on the connection row only: a publish does not report
+them in `site_refresh`.
+
 Havadis calls `https` addresses on public hosts only, never follows a
 redirect, and waits at most 10 seconds.
 
 ## Telling Havadis where the post went
 
-Havadis cannot know the address your site gives a post. Tell it, and the
-post's performance is measured from the first day, without anyone typing
-the address in the dashboard.
+A site that serves each post under the feed's `slug` needs to do nothing:
+Havadis builds the address from your post-URL pattern (the brand's
+"Blog yazısı adres kalıbı", e.g. `https://acme.com/blog/{slug}`), or from
+the posts of yours Google already shows, and measures the post's
+performance from the first day.
+
+If your site gives posts addresses of its own, tell Havadis; what your
+site reports always wins over the built address.
 
 **At once:** answer `content.published` with JSON:
 
@@ -135,4 +144,5 @@ The connection row in the dashboard shows how the last delivery went:
 | `not_sent` | Havadis could not prepare the delivery. Try again in a moment. |
 
 A publish whose webhook failed answers with the same reason in
-`site_refresh` (`{ reason, http_status }`).
+`site_refresh` (`{ reason, http_status }`), unless it went to the default
+address (see [Where the webhook goes](#where-the-webhook-goes)).
