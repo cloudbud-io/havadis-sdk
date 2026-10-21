@@ -17,8 +17,10 @@ published here as a snippet on purpose: agents read your repo root, not
 - `completed_with_warnings` is a SUCCESS state. Handle
   `DailySpendCapError`/`RateLimitError` by waiting `retryAfterSeconds`,
   never by looping.
-- Embed `cover_image_url` as returned (stable re-signing route); never
-  copy raw storage URLs out of other fields.
+- `cover_image_url` needs the API key, so never put it in a page: embed a
+  published post's cover from the keyless
+  `/api/v1/public/brands/{brandId}/contents/{id}/cover`, and never copy raw
+  storage URLs out of other fields.
 - Serve each post at one path plus the feed's `slug` (`/blog/{slug}`), so
   Havadis knows its address; a route that picks its own paths must report
   them with `contents.reportSitePublication`.

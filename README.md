@@ -48,8 +48,8 @@ console.log(content.title, content.seo_metadata.slug);
 ```ts
 // At build time (SSG) or in a route handler:
 for await (const item of havadis.brand(brandId).contents.list({ status: 'published' })) {
-  // item.cover_image_url is a stable API route that re-signs storage
-  // access per request — safe to embed in generated pages.
+  // item.cover_image_url needs your key; embed the public feed's cover
+  // route instead (docs/feeding-your-site.md, "Cover images").
   renderCard(item);
 }
 ```

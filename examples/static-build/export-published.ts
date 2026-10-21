@@ -8,6 +8,8 @@ import { Havadis } from '@havadis/sdk';
 
 const havadis = new Havadis({ apiKey: process.env.HAVADIS_API_KEY! });
 const scope = havadis.brand(process.env.HAVADIS_BRAND_ID!);
+// `cover_image_url` needs the key; a published cover is public at this route.
+const covers = `https://api.gethavadis.co/api/v1/public/brands/${process.env.HAVADIS_BRAND_ID}/contents`;
 
 async function main(): Promise<void> {
   await mkdir('content-out', { recursive: true });
@@ -23,7 +25,7 @@ async function main(): Promise<void> {
           seo: detail.seo_metadata,
           faq: detail.aeo_metadata.faq_items,
           jsonLd: detail.geo_metadata.structured_data,
-          cover: detail.cover_image_url,
+          cover: detail.cover_image_url && `${covers}/${detail.id}/cover`,
           publishedAt: detail.published_at,
         },
         null,

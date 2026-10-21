@@ -27,6 +27,8 @@ import { Havadis } from '@havadis/sdk';
 
 const havadis = new Havadis({ apiKey: process.env.HAVADIS_API_KEY! });
 const scope = havadis.brand(process.env.HAVADIS_BRAND_ID!);
+// Keyless and embeddable; see "Cover images" below.
+const covers = `https://api.gethavadis.co/api/v1/public/brands/${process.env.HAVADIS_BRAND_ID}/contents`;
 
 for await (const item of scope.contents.list({ status: 'published' })) {
   const detail = await scope.contents.get(item.id);
@@ -37,14 +39,23 @@ for await (const item of scope.contents.list({ status: 'published' })) {
     meta: detail.seo_metadata,          // <title>, description, keywords
     faq: detail.aeo_metadata.faq_items, // FAQPage section
     jsonLd: detail.geo_metadata.structured_data, // embed as-is
-    cover: detail.cover_image_url,      // stable URL — embed directly
+    cover: detail.cover_image_url && `${covers}/${detail.id}/cover`,
   });
 }
 ```
 
-Why `cover_image_url` is safe to embed: it is an API route that re-signs
-storage access on every request. Raw storage URLs expire within 7 days
-and would 403 out of a statically built page.
+## Cover images
+
+`cover_image_url` is a route on the Havadis API that needs your key, so a
+visitor's browser cannot load it. A published post's cover is also served
+without a key, at
+`https://api.gethavadis.co/api/v1/public/brands/{brandId}/contents/{id}/cover`:
+put that straight into an `<img>` on your site. It re-signs storage access
+on every request (raw storage URLs expire within 7 days and would 403 out
+of a statically built page), so it is safe to persist.
+
+For a draft (a preview screen), download the image on your server with
+your key and serve your own copy.
 
 ## Pagination that cannot loop
 

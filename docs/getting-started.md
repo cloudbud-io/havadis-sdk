@@ -52,7 +52,7 @@ const detail = await scope.contents.get(contentId);
 // detail.seo_metadata       — meta title/description/keywords/slug
 // detail.aeo_metadata       — featured snippet target + FAQ items
 // detail.geo_metadata       — citations + embeddable JSON-LD
-// detail.cover_image_url    — stable API route; embed as-is
+// detail.cover_image_url    — needs your key; see feeding-your-site.md for covers
 // detail.article_format     — 'use_case' for a use-case article, else null
 ```
 

@@ -36,8 +36,10 @@ const scope = havadis.brand(brandId);
 2. **Render**: `for await (const c of scope.contents.list({ status: 'published' }))`
    then `scope.contents.get(id)` → `body` (markdown), `seo_metadata`,
    `aeo_metadata.faq_items`, `geo_metadata.structured_data` (embed
-   as-is), `cover_image_url` (stable re-signing route — embed directly,
-   never a raw storage URL).
+   as-is), `cover_image_url` (needs the key, so never put it in a page; embed a
+   published post's cover from the keyless
+   `/api/v1/public/brands/{brandId}/contents/{id}/cover`, never a raw
+   storage URL).
 3. **Publish**: `scope.contents.publish(contentId)` (v1 channel:
    custom_website only). `warnings` is a stable enum, not prose. Serve
    each post at one path + its `slug` (`/blog/{slug}`): Havadis builds
