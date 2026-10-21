@@ -53,7 +53,10 @@ const scope = havadis.brand(brandId);
    `product_page_unreadable`, credits refunded). Approve a suggestion into
    a job with `jobs.create({ ..., suggestionId })` — never by copying its
    brief alone, or its format and research page are lost.
-5. **Webhooks**: `verifyWebhook<SiteRefreshEvent>(rawBody, headers, whsecSecret)`
+5. **Webhooks** (optional): serve the receiver at `POST /api/revalidate`
+   on the connected domain (the default, so the connection needs no
+   webhook address) and verify with
+   `verifyWebhook<SiteRefreshEvent>(rawBody, headers, whsecSecret)`
    — Standard Webhooks v1; verify raw bytes BEFORE parsing. Use-case
    articles arrive as `contentType: 'blog'` with `articleFormat: 'use_case'`.
 

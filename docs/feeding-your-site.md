@@ -5,6 +5,20 @@ generated, drafts included, on your stack. The SDK returns wire data —
 rendering is deliberately yours (no components, no cache, no framework
 peer dependency).
 
+## Connecting your site
+
+1. Dashboard → **Settings → Connected accounts → Custom website**: your
+   site's name and domain. Leave the webhook address empty.
+2. Render each post under one path plus the feed's `slug` (below). That
+   is how Havadis knows every post's address; see
+   [Where your posts live](#where-your-posts-live).
+3. Optional: a webhook receiver at `/api/revalidate` on the same domain,
+   if pages must refresh the moment a post is published
+   ([Refresh pings](#refresh-pings-optional)).
+
+Each value is set once: the domain on the connection, the path in your
+code (or the brand's post-URL pattern, for a path Google has not seen yet).
+
 ## Static build (SSG)
 
 ```ts

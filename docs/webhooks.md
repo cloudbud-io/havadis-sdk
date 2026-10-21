@@ -22,7 +22,8 @@ import {
   type SiteRefreshEvent,
 } from '@havadis/sdk';
 
-app.post('/hooks/havadis', express.raw({ type: '*/*' }), (req, res) => {
+// The default address: no webhook address to enter on the connection.
+app.post('/api/revalidate', express.raw({ type: '*/*' }), (req, res) => {
   try {
     const event = verifyWebhook<SiteRefreshEvent>(
       req.body,
@@ -76,11 +77,14 @@ handle) with a 2xx.
 ## Where the webhook goes
 
 Havadis sends the webhook to the **webhook address** on your site's
-connection. Left empty, that is `https://<your domain>/api/revalidate`,
-the route the Next.js starter serves. If your receiver lives anywhere else
-(an API on another host, a different path), enter its address on the
-connection; the default address will otherwise answer `404` or `405` and
-your site will not hear about new posts.
+connection. Left empty, that is `https://<your domain>/api/revalidate`.
+
+Serve your receiver there and leave the address empty: the path then lives
+in one place, your code, with nothing on the connection to keep in sync.
+Enter an address only when the receiver cannot live there (an API on
+another host, such as `https://api.acme.com/webhooks/havadis`); otherwise
+the default address answers `404` or `405` and your site does not hear
+about new posts.
 
 A site that pulls the feed needs no webhook. Failures of the default
 address are shown on the connection row only: a publish does not report

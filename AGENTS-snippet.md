@@ -22,4 +22,6 @@ published here as a snippet on purpose: agents read your repo root, not
 - Serve each post at one path plus the feed's `slug` (`/blog/{slug}`), so
   Havadis knows its address; a route that picks its own paths must report
   them with `contents.reportSitePublication`.
+- A Havadis webhook receiver, if any, lives at `POST /api/revalidate` on
+  the connected domain, so the connection needs no webhook address.
 ```
