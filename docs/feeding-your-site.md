@@ -58,9 +58,30 @@ await scope.contents.unpublish(contentId);
 The result's `warnings` array uses a stable enum
 (`site_refresh_not_triggered`, `channel_state_not_stamped`) — the publish
 itself succeeded; a non-critical follow-up degraded.
+`site_refresh_not_triggered` is only raised for a webhook address typed on
+the connection (see below).
 
-## Refresh pings
+## Where your posts live
 
-When content is published, Havadis pings your configured site-refresh
-webhook with Standard Webhooks signature headers — verify with
-`verifyWebhook` (see `webhooks.md`) and rebuild the affected page.
+Serve every post under one path plus the feed's `slug`, as the build above
+does (`/blog/${detail.slug}`, `/tr/yazi/${detail.slug}`, …). Havadis then
+knows each post's address the moment it is published and measures its
+search performance from the first day. It takes the path from the brand's
+post-URL pattern (the "Blog yazısı adres kalıbı" setting, for example
+`https://acme.com/blog/{slug}`) or, without one, from your posts Google
+already shows (with Search Console connected).
+
+A site that gives posts addresses of its own (a CMS that slugs titles, an
+approval queue) reports them instead; see "Telling Havadis where the post
+went" in `webhooks.md`. What your site reports always wins.
+
+## Refresh pings (optional)
+
+When content is published, Havadis pings your site's webhook with
+Standard Webhooks signature headers — verify with `verifyWebhook` (see
+`webhooks.md`) and rebuild the affected page.
+
+A site that reads the feed on every request, or rebuilds on a schedule,
+needs no webhook. With no webhook address on the connection, the ping goes
+to `https://<your domain>/api/revalidate`; a failure there is shown on the
+connection in the dashboard only.

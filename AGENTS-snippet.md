@@ -19,4 +19,7 @@ published here as a snippet on purpose: agents read your repo root, not
   never by looping.
 - Embed `cover_image_url` as returned (stable re-signing route); never
   copy raw storage URLs out of other fields.
+- Serve each post at one path plus the feed's `slug` (`/blog/{slug}`), so
+  Havadis knows its address; a route that picks its own paths must report
+  them with `contents.reportSitePublication`.
 ```

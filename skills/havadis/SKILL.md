@@ -39,7 +39,11 @@ const scope = havadis.brand(brandId);
    as-is), `cover_image_url` (stable re-signing route — embed directly,
    never a raw storage URL).
 3. **Publish**: `scope.contents.publish(contentId)` (v1 channel:
-   custom_website only). `warnings` is a stable enum, not prose.
+   custom_website only). `warnings` is a stable enum, not prose. Serve
+   each post at one path + its `slug` (`/blog/{slug}`): Havadis builds
+   the post's address from that. Only a site that picks its own paths
+   reports them (`contents.reportSitePublication`, or `{ status, url }`
+   in the webhook answer).
 4. **Topics**: `const { run_id } = await scope.topics.suggest()` (async)
    → `await scope.topics.waitForRun(run_id)` → `scope.topics.list()`.
    Pass `focus: { source: 'product_page', url }` for one suggestion per

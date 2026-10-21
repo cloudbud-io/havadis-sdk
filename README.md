@@ -67,6 +67,10 @@ const event = verifyWebhook(rawBody, req.headers, process.env.HAVADIS_WEBHOOK_SE
 
 `rawBody` must be the exact request bytes — verify **before** JSON parsing.
 
+Webhooks are optional: a site that reads the feed itself needs none, and
+Havadis knows a post's address as long as your site serves it under the
+feed's `slug` ([docs/feeding-your-site.md](./docs/feeding-your-site.md)).
+
 ## Docs
 
 Full guides ship inside the package under
