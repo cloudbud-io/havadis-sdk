@@ -23,7 +23,7 @@ import {
 } from '@havadis/sdk';
 
 // The default address: no webhook address to enter on the connection.
-app.post('/api/revalidate', express.raw({ type: '*/*' }), (req, res) => {
+app.post('/api/webhooks/havadis', express.raw({ type: '*/*' }), (req, res) => {
   try {
     const event = verifyWebhook<SiteRefreshEvent>(
       req.body,
@@ -33,7 +33,7 @@ app.post('/api/revalidate', express.raw({ type: '*/*' }), (req, res) => {
     // A test from the dashboard only proves the address and the secret.
     if (event.event === 'webhook.test') return res.sendStatus(204);
     // { event: 'content.published', contentId, contentType, articleFormat, slug, title }
-    revalidate(event.slug);
+    refreshPost(event.slug);
     res.sendStatus(204);
   } catch (err) {
     if (err instanceof WebhookVerificationError) return res.sendStatus(401);
@@ -77,12 +77,12 @@ handle) with a 2xx.
 ## Where the webhook goes
 
 Havadis sends the webhook to the **webhook address** on your site's
-connection. Left empty, that is `https://<your domain>/api/revalidate`.
+connection. Left empty, that is `https://<your domain>/api/webhooks/havadis`.
 
 Serve your receiver there and leave the address empty: the path then lives
 in one place, your code, with nothing on the connection to keep in sync.
 Enter an address only when the receiver cannot live there (an API on
-another host, such as `https://api.acme.com/webhooks/havadis`); otherwise
+another host, such as `https://api.acme.com/api/webhooks/havadis`); otherwise
 the default address answers `404` or `405` and your site does not hear
 about new posts.
 

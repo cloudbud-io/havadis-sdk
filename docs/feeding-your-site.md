@@ -12,8 +12,8 @@ peer dependency).
 2. Render each post under one path plus the feed's `slug` (below). That
    is how Havadis knows every post's address; see
    [Where your posts live](#where-your-posts-live).
-3. Optional: a webhook receiver at `/api/revalidate` on the same domain,
-   if pages must refresh the moment a post is published
+3. Optional: a webhook receiver at `/api/webhooks/havadis` on the same
+   domain, if pages must refresh the moment a post is published
    ([Refresh pings](#refresh-pings-optional)).
 
 Each value is set once: the domain on the connection, the path in your
@@ -108,5 +108,5 @@ Standard Webhooks signature headers — verify with `verifyWebhook` (see
 
 A site that reads the feed on every request, or rebuilds on a schedule,
 needs no webhook. With no webhook address on the connection, the ping goes
-to `https://<your domain>/api/revalidate`; a failure there is shown on the
-connection in the dashboard only.
+to `https://<your domain>/api/webhooks/havadis`; a failure there is shown
+on the connection in the dashboard only.
