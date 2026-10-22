@@ -335,7 +335,8 @@ export interface Me {
     scopes: string[];
     /**
      * The brands this key reaches; every other brand answers 404
-     * `brand_not_found`. Null only on a key from before brand scoping.
+     * `brand_not_found`. Null when it reaches every brand its owner owns:
+     * a key from before brand scoping, or a user-authorized OAuth token.
      */
     brand_ids: string[] | null;
   };
