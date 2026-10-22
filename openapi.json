@@ -147,12 +147,26 @@
                           "items": {
                             "type": "string"
                           }
+                        },
+                        "brand_ids": {
+                          "anyOf": [
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       },
                       "required": [
                         "prefix",
                         "label",
-                        "scopes"
+                        "scopes",
+                        "brand_ids"
                       ]
                     },
                     "limits": {

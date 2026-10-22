@@ -329,7 +329,16 @@ export interface SitePublicationResult {
 
 export interface Me {
   tenant: { id: string; name: string; slug: string; plan: string };
-  api_key: { prefix: string; label: string; scopes: string[] };
+  api_key: {
+    prefix: string;
+    label: string;
+    scopes: string[];
+    /**
+     * The brands this key reaches; every other brand answers 404
+     * `brand_not_found`. Null only on a key from before brand scoping.
+     */
+    brand_ids: string[] | null;
+  };
   limits: { rate_limit_per_minute: number; daily_credit_cap: number };
 }
 

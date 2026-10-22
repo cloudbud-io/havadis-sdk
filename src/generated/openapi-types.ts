@@ -364,6 +364,7 @@ export interface operations {
                             prefix: string;
                             label: string;
                             scopes: string[];
+                            brand_ids: string[] | null;
                         };
                         limits: {
                             rate_limit_per_minute: number;
