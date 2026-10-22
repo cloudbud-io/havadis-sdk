@@ -4,8 +4,15 @@
 
 Dashboard → **Settings → Developer → New key**. The plaintext
 `havadis_<prefix>_<secret>` token is shown **once** — store it in a secret
-manager and pass it as an environment variable. Keys can be narrowed to a
-scope subset at creation; the full catalog is:
+manager and pass it as an environment variable.
+
+A key belongs to the brands you pick when you create it. It reaches only
+those: any other brand answers 404 (`NotFoundError`, `brand_not_found`), and
+`brands.list()` returns only the key's brands. Brands you add later are not
+included; create a new key for them.
+
+Keys can also be narrowed to a scope subset at creation; the full catalog
+is:
 
 `brands:read` `brands:write` `content:read` `content:write` `topics:read`
 `topics:write` `jobs:read` `jobs:write` `credits:read` `billing:read`
@@ -22,8 +29,9 @@ const havadis = new Havadis({ apiKey: process.env.HAVADIS_API_KEY! });
 console.log(await havadis.me.get());
 ```
 
-`me.get()` answers with the tenant, the key's **effective** scopes and its
-limits — the fastest way to verify wiring.
+`me.get()` answers with the tenant, the key's **effective** scopes, the
+brands it reaches (`brand_ids`) and its limits — the fastest way to verify
+wiring.
 
 ## 3. Preview cost, then generate
 
