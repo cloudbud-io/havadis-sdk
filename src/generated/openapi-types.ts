@@ -52,7 +52,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Brands owned by the calling tenant
+         * Brands the calling key can reach
          * @description Requires scope: `brands:read`.
          */
         get: operations["brands.list"];
@@ -72,7 +72,7 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * One owned brand
+         * One brand the calling key can reach
          * @description Requires scope: `brands:read`.
          */
         get: operations["brands.get"];
