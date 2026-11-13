@@ -9,9 +9,28 @@ webhook-timestamp: 1756800000
 webhook-signature: v1,BASE64HMAC [v1,BASE64HMAC…]
 ```
 
-The signature is `HMAC-SHA256(secret, "<id>.<timestamp>.<raw body>")`.
-Your signing secret (`whsec_…`) lives next to your site connection in the
-dashboard.
+The signature is `HMAC-SHA256(key, "<id>.<timestamp>.<raw body>")`, base64
+encoded, where `key` is the base64-decoded part of your `whsec_…` secret
+after the `whsec_` prefix. `verifyWebhook` does all of this for you.
+
+## The signing secret
+
+Every custom website connection has its own `whsec_…` secret.
+
+- **Shown once.** The dashboard shows it when you connect the site
+  (**Settings → Connected accounts → Custom website**). Copy it then into
+  your receiver's environment (`HAVADIS_WEBHOOK_SECRET` below). Afterwards
+  the connection only shows it masked; the dashboard never shows it again.
+- **Lost it, or never copied it?** Press **Rotate** on the connection's
+  **Signing secret** row. A connection that has none yet shows
+  **Create** instead. The new secret is shown once, the same way.
+- **Rotation does not break deliveries.** After a rotation Havadis signs
+  every delivery with both the new and the previous secret, until you
+  rotate again. Put the new secret on your receiver at your own pace; a
+  receiver still holding the previous one keeps passing. The next
+  rotation retires the older secret.
+- **A GitHub `repository_dispatch` address is not signed.** It carries
+  your GitHub token instead, so it has no signing secret.
 
 ## Verifying
 
@@ -49,15 +68,18 @@ Rules the verifier enforces for you:
   `express.json`, on this route.)
 - **5-minute tolerance** on `webhook-timestamp` (configurable) — blocks
   replay of captured deliveries.
-- **Multiple signatures accepted.** During secret rotation Havadis signs
-  with both secrets; any single match passes, so rotation is zero
-  downtime.
+- **Multiple signatures accepted.** After a rotation the
+  `webhook-signature` header carries one signature per live secret; a
+  match with any of them passes, so the secret you hold keeps working.
 - **Constant-time comparison.**
 
 ## Idempotent handling
 
-Deliveries can repeat (retries). `webhook-id` is stable per event — treat
-it as your dedupe key.
+Havadis does not retry a failed delivery; the failure shows on the
+connection row in the dashboard. The same post can still arrive again (for
+example, published again after an unpublish), and every delivery has a new
+`webhook-id`. Make the handler safe to run twice for the same
+`contentId`: refreshing a page again is harmless.
 
 ## Payload
 

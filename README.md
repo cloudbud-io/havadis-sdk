@@ -66,6 +66,10 @@ const event = verifyWebhook(rawBody, req.headers, process.env.HAVADIS_WEBHOOK_SE
 ```
 
 `rawBody` must be the exact request bytes — verify **before** JSON parsing.
+The `whsec_…` secret is shown once, when you connect the site in the
+dashboard; rotate it on the connection to get a new one (the previous one
+keeps working until the next rotation). See
+[docs/webhooks.md](./docs/webhooks.md#the-signing-secret).
 
 Webhooks are optional: a site that reads the feed itself needs none, and
 Havadis knows a post's address as long as your site serves it under the

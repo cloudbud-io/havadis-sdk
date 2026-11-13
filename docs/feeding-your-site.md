@@ -104,7 +104,9 @@ went" in `webhooks.md`. What your site reports always wins.
 
 When content is published, Havadis pings your site's webhook with
 Standard Webhooks signature headers — verify with `verifyWebhook` (see
-`webhooks.md`) and rebuild the affected page.
+`webhooks.md`) and rebuild the affected page. The signing secret is shown
+once, when you connect the site; copy it then, or rotate it on the
+connection later (see "The signing secret" in `webhooks.md`).
 
 A site that reads the feed on every request, or rebuilds on a schedule,
 needs no webhook. With no webhook address on the connection, the ping goes
