@@ -1,12 +1,12 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
   "name": "co.gethavadis/havadis",
-  "description": "Brand-aware AI content generation: create blog/social content jobs, discover topics, read results and credits for your Havadis workspace.",
+  "description": "Brand-aware AI content for your Havadis workspace: create blog and social content, discover topics, edit and schedule posts, read search and AI visibility reports.",
   "repository": {
     "url": "https://github.com/cloudbud-io/havadis-sdk",
     "source": "github"
   },
-  "version": "0.2.0",
+  "version": "1.0.0",
   "websiteUrl": "https://gethavadis.co/developers?from=mcp-registry",
   "remotes": [
     {
