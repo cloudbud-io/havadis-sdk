@@ -1716,7 +1716,7 @@
                 "properties": {
                   "contentTypes": {
                     "minItems": 1,
-                    "maxItems": 5,
+                    "maxItems": 7,
                     "type": "array",
                     "items": {
                       "type": "string",
