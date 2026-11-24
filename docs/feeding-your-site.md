@@ -68,7 +68,7 @@ key) also carries what a blog page shows around the text:
 | `language` | Output language code; `null` on posts written before it was tracked |
 | `translations` | `[{ language, slug }]`, the post's published versions in other languages, for `hreflang` |
 | `category`, `author` | Set per post; `Blog` and empty when none was set |
-| `updatedAt` | When the title or body last changed; equals `publishedAt` until then |
+| `updatedAt` | When the title, body or FAQ last changed; equals `publishedAt` until then |
 | `keywords` | The post's keywords |
 | `shortAnswer`, `faq` | Filled on the single-post route only, like `bodyMarkdown` |
 
