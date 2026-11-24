@@ -57,6 +57,23 @@ of a statically built page), so it is safe to persist.
 For a draft (a preview screen), download the image on your server with
 your key and serve your own copy.
 
+## A multilingual blog
+
+The public feed
+(`https://api.gethavadis.co/api/v1/public/brands/{brandId}/contents`, no
+key) also carries what a blog page shows around the text:
+
+| Field | Notes |
+| --- | --- |
+| `language` | Output language code; `null` on posts written before it was tracked |
+| `translations` | `[{ language, slug }]`, the post's published versions in other languages, for `hreflang` |
+| `category`, `author` | Set per post; `Blog` and empty when none was set |
+| `updatedAt` | When the title or body last changed; equals `publishedAt` until then |
+| `keywords` | The post's keywords |
+| `shortAnswer`, `faq` | Filled on the single-post route only, like `bodyMarkdown` |
+
+Ask for one language with `?language=tr`.
+
 ## Pagination that cannot loop
 
 Lists are keyset-paged over an immutable ordering; pass back exactly the
