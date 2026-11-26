@@ -20,23 +20,25 @@ Extra scope or focus from the user (may be empty): $ARGUMENTS
 3. SOLID and DRY: duplicated logic, functions with more than one responsibility, concrete dependencies where an abstraction already exists, leaky layers, magic strings and numbers, speculative abstractions.
 4. Security and fraud: go through `../security-audit/checklist.md` for the changed code.
 5. Readability: unclear names, deep nesting, long functions, drift from project conventions.
+6. CI cost: if a workflow file changed, list every step, job, trigger, and schedule the user did not ask for, tests and lint included, and check the rest against the team CI cost rule.
 
 Present the audit as one table:
 
 | # | Item | Location (file:line) | Category | Severity | Proposed action |
 |---|------|----------------------|----------|----------|-----------------|
 
-Category: dead code, SOLID-DRY, security, fraud, or readability. Severity: high, medium, or low.
+Category: dead code, SOLID-DRY, security, fraud, readability, or CI cost. Severity: high, medium, or low.
 
 Wait for confirmation before Phase 2, unless every item is low severity.
 
 ## Phase 2: Apply
 1. Remove all confirmed dead code completely: no commented-out code, no "deprecated" markers, no TODOs.
 2. Fix all high and medium security and fraud items, using existing project patterns (validators, guards, middleware, error types) instead of new ones.
-3. Refactor for SOLID/DRY only where it removes duplication or clarifies responsibility. Keep functions small, names explicit, and dependencies injected.
-4. Generalize only when there are 2+ concrete call sites today or a documented near-term need. If you generalize, keep the public API minimal and typed.
-5. Follow the existing code style, naming, folder structure, and lint rules. Don't add a library without stating why.
-6. Commit as described in Commits below.
+3. Remove the confirmed CI cost items from the workflow files.
+4. Refactor for SOLID/DRY only where it removes duplication or clarifies responsibility. Keep functions small, names explicit, and dependencies injected.
+5. Generalize only when there are 2+ concrete call sites today or a documented near-term need. If you generalize, keep the public API minimal and typed.
+6. Follow the existing code style, naming, folder structure, and lint rules. Don't add a library without stating why.
+7. Commit as described in Commits below.
 
 ## Phase 3: Verify
 1. Run lint, type check, build, and the full test suite. Fix anything you broke.
@@ -47,7 +49,7 @@ Wait for confirmation before Phase 2, unless every item is low severity.
 Commit as you go, one logical change per commit, following the team git rule:
 - Subject: `type(scope): summary` in imperative mood, lowercase after the colon, no trailing period, about 72 characters max. Describe the behavior change, not the files.
 - Body only when the subject isn't enough: one to four lines on why, with concrete facts (counts, dates, status codes). No file lists, no narration.
-- Dead code removals and SOLID/DRY cleanups are `refactor`; security and fraud fixes are `fix`. Never mix a refactor with a fix. Tests go in the commit of the change they cover.
+- Dead code removals and SOLID/DRY cleanups are `refactor`; security and fraud fixes are `fix`; workflow changes are `ci`. Never mix a refactor with a fix. Tests go in the commit of the change they cover.
 - No `Co-Authored-By` or other AI attribution lines; the developer is the only author. Never push.
 
 Example:

@@ -4,6 +4,7 @@
 - For a large or ambiguous task (new feature, several layers, schema or security rule change, auth or payments), propose a short plan first and implement once it is agreed, unless told to go ahead. `/plan-feature` does this in depth.
 - Ask only when the answer changes the design; otherwise pick the conventional option and say which one.
 - For fast-moving frameworks and SDKs, check the installed version's docs instead of relying on memory.
+- CI minutes are billed. Don't create a CI workflow or add a job, step, trigger, or schedule to one unless asked, tests and lint included; run checks locally instead.
 - Before calling the task done:
   - Run lint, type check, build, and the relevant tests, and fix what you broke. If the project has a `verify` skill, follow it.
   - If the lint script auto-fixes the whole repo (`--fix`), lint only the files you changed.

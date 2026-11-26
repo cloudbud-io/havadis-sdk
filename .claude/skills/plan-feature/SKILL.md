@@ -27,6 +27,7 @@ Keep it scannable: one or two lines per item, no prose paragraphs, and skip sect
 - **Data**: schema, security rule, and migration changes, and backward compatibility.
 - **UI/UX**: states, mobile behavior, and user-facing copy, following the UI/UX and marketing best practices for the product's audience.
 - **Security and fraud**: authorization, input validation, client-trusted values, rate limits, race conditions (see `../security-audit/checklist.md`, relative to this skill's directory).
+- **CI/CD**: no workflow change by default. If the task needs one, give its run time, how often it triggers, and the minutes per month.
 - **Edge cases and failure modes.**
 - **Verification**: the tests to add and how you'll confirm it works.
 - **Risks and open questions.**
